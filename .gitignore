@@ -1,0 +1,28 @@
+# --- Secrets: never commit ---
+.env
+
+# --- Virtual environment ---
+.venv/
+
+# --- Python caches ---
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Guideline PDFs (copyrighted; recorded in data/raw/MANIFEST.md instead) ---
+*.pdf
+
+# --- Data and run outputs (keep folder placeholders and the manifest) ---
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/MANIFEST.md
+data/processed/*
+!data/processed/.gitkeep
+runs/*
+!runs/.gitkeep
+
+# --- macOS ---
+.DS_Store

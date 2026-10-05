@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+# Let tests import sugar360_cds from src/ without installing the package.
+pythonpath = ["src"]
+testpaths = ["tests"]

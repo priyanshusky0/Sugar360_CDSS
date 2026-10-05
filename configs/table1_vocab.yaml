@@ -1,0 +1,26 @@
+# Test Table 1 - drug choice for type 2 diabetes
+#
+# STATUS: DRAFT - written by the engineering side as a starting point.
+# A doctor must review and approve this list before any evaluation results
+# are trusted. Every drafted row and every answer-key row may only use the
+# factors, values and actions listed here.
+#
+# Values are quoted on purpose: unquoted yes/no become True/False in YAML.
+
+factors:
+  on_metformin: ["yes", "no"]
+  hba1c_vs_target: ["at_or_below", "above"]
+  ascvd: ["yes", "no"]               # established atherosclerotic CV disease
+  heart_failure: ["yes", "no"]
+  ckd_gfr_category: ["G1", "G2", "G3a", "G3b", "G4", "G5"]   # KDIGO eGFR categories
+  albuminuria: ["yes", "no"]
+  cost_constraint: ["yes", "no"]
+
+actions:
+  - metformin
+  - SGLT2i
+  - GLP1_RA
+  - DPP4i
+  - sulfonylurea
+  - TZD
+  - insulin
