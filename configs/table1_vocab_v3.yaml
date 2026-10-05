@@ -1,0 +1,173 @@
+# Test Table 1 - drug choice for type 2 diabetes. Vocabulary v3.
+#
+# STATUS: DRAFT - written by the engineering side. A doctor must review and
+# approve it before evaluation results are trusted.
+#
+# Changes from v2 (docs/decisions.md D13): heart failure status (stable /
+# unstable or hospitalised), metformin_contraindicated, a "preferred" strength,
+# row labels (stated / inferred) and evidence words per input.
+#
+# Numeric inputs are written ">=30", ">7", "<45" or "30-45" in the given unit.
+# Anything the inputs cannot hold goes in the row's free-text "other conditions".
+#
+# evidence: regular expressions (case-insensitive). If a row uses an input but
+# none of its evidence patterns appears in the row's quote or heading, the row
+# is marked "inferred" (the condition was not written in the source).
+# Values are quoted on purpose: unquoted yes/no become True/False in YAML.
+
+inputs:
+  on_metformin:
+    type: category
+    values: ["yes", "no"]
+    label: "On metformin"
+    evidence: ['on metformin', 'despite metformin', 'metformin alone', 'metformin monotherapy',
+               'in addition to metformin', 'add-on to metformin', 'after metformin', 'with metformin',
+               'drug.na[iï]ve', 'newly diagnosed', 'at diagnosis', 'initial', 'first.line']
+  hba1c_above_target:
+    type: category
+    values: ["yes", "no"]
+    label: "HbA1c above target"
+    evidence: ['target', 'goal', 'not achieved', 'not at', 'uncontrolled', 'inadequate', 'insufficient', 'above']
+  hba1c:
+    type: number
+    unit: "%"
+    label: "HbA1c"
+    evidence: ['hba1c', '\ba1c', 'glycated']
+  ascvd:
+    type: category
+    values: ["yes", "no"]
+    label: "Established ASCVD"
+    evidence: ['ascvd', 'atherosclerotic', 'cardiovascular disease', '\bcvd\b', 'coronary', 'stroke', 'myocardial']
+  high_cv_risk:
+    type: category
+    values: ["yes", "no"]
+    label: "High CV risk / multiple ASCVD risk factors"
+    evidence: ['risk factor', 'high risk', 'cardiovascular risk', '\bcv risk', 'indicators of high']
+  heart_failure:
+    type: category
+    # yes = heart failure, status not stated; stable / unstable_or_hospitalized when the source says so
+    values: ["no", "yes", "stable", "unstable_or_hospitalized"]
+    label: "Heart failure"
+    evidence: ['heart failure', '\bhf', 'ejection fraction', 'cardiac failure']
+  ckd:
+    type: category
+    values: ["yes", "no"]
+    label: "CKD"
+    evidence: ['\bckd', 'kidney', 'renal', 'nephropathy', '\bdkd', 'egfr']
+  egfr:
+    type: number
+    unit: "mL/min/1.73 m²"
+    label: "eGFR"
+    evidence: ['egfr', '\bgfr', 'ml/min']
+  uacr:
+    type: number
+    unit: "mg/g"
+    label: "UACR"
+    evidence: ['\bacr', 'albumin']
+  bmi:
+    type: number
+    unit: "kg/m²"
+    label: "BMI"
+    evidence: ['\bbmi', 'obes', 'overweight', 'kg/m']
+  age:
+    type: number
+    unit: "years"
+    label: "Age"
+    evidence: ['\bage\b', '\baged\b', 'elderly', 'older', 'years']
+  hypoglycemia_risk:
+    type: category
+    values: ["yes", "no"]
+    label: "High hypoglycemia risk"
+    evidence: ['hypoglyc']
+  symptomatic_hyperglycemia:
+    type: category
+    values: ["yes", "no"]
+    label: "Symptomatic / severe hyperglycemia"
+    evidence: ['symptom', 'catabolic', 'polyuria', 'very high', 'severe hyperglyc']
+  cost_constraint:
+    type: category
+    values: ["yes", "no"]
+    label: "Cost / resource constraint"
+    evidence: ['cost', 'afford', 'resource', 'price', 'limited care']
+  metformin_contraindicated:
+    type: category
+    values: ["yes", "no"]
+    label: "Metformin contraindicated / not tolerated"
+    evidence: ['contraindicat', 'intoleran', 'not tolerat', 'cannot', 'unable to']
+
+  # Current glucose-lowering medicines (D15). Evidence: the class named together with
+  # 'on', 'in combination with', 'together with', 'concomitant', 'receiving', 'treated with'.
+  on_SGLT2i:
+    type: category
+    values: ["yes", "no"]
+    label: "On SGLT2i"
+    evidence: ['\b(?:on|in combination with|together with|concomitant\w*|receiving|treated with|already)\W+(?:\w+\W+){0,3}(?:sglt-?2)']
+  on_GLP1_RA:
+    type: category
+    values: ["yes", "no"]
+    label: "On GLP1_RA"
+    evidence: ['\b(?:on|in combination with|together with|concomitant\w*|receiving|treated with|already)\W+(?:\w+\W+){0,3}(?:glp-?1)']
+  on_GIP_GLP1_RA:
+    type: category
+    values: ["yes", "no"]
+    label: "On GIP_GLP1_RA"
+    evidence: ['\b(?:on|in combination with|together with|concomitant\w*|receiving|treated with|already)\W+(?:\w+\W+){0,3}(?:\bgip\b|tirzepatide)']
+  on_DPP4i:
+    type: category
+    values: ["yes", "no"]
+    label: "On DPP4i"
+    evidence: ['\b(?:on|in combination with|together with|concomitant\w*|receiving|treated with|already)\W+(?:\w+\W+){0,3}(?:dpp-?4|dpp-?iv|gliptin)']
+  on_sulfonylurea:
+    type: category
+    values: ["yes", "no"]
+    label: "On sulfonylurea"
+    evidence: ['\b(?:on|in combination with|together with|concomitant\w*|receiving|treated with|already)\W+(?:\w+\W+){0,3}(?:sulfonylurea|sulphonylurea|\bsus?\b)']
+  on_TZD:
+    type: category
+    values: ["yes", "no"]
+    label: "On TZD"
+    evidence: ['\b(?:on|in combination with|together with|concomitant\w*|receiving|treated with|already)\W+(?:\w+\W+){0,3}(?:\btzds?\b|thiazolidinedione|pioglitazone)']
+  on_AGI:
+    type: category
+    values: ["yes", "no"]
+    label: "On AGI"
+    evidence: ['\b(?:on|in combination with|together with|concomitant\w*|receiving|treated with|already)\W+(?:\w+\W+){0,3}(?:\bagis?\b|acarbose|alpha.glucosidase)']
+  on_glinide:
+    type: category
+    values: ["yes", "no"]
+    label: "On glinide"
+    evidence: ['\b(?:on|in combination with|together with|concomitant\w*|receiving|treated with|already)\W+(?:\w+\W+){0,3}(?:glinide)']
+  on_insulin:
+    type: category
+    values: ["yes", "no"]
+    label: "On insulin"
+    evidence: ['\b(?:on|in combination with|together with|concomitant\w*|receiving|treated with|already)\W+(?:\w+\W+){0,3}(?:insulin)']
+
+actions:
+  - metformin
+  - SGLT2i
+  - GLP1_RA
+  - GIP_GLP1_RA      # dual agonist, e.g. tirzepatide
+  - DPP4i
+  - sulfonylurea
+  - TZD
+  - AGI              # alpha-glucosidase inhibitor
+  - glinide
+  - insulin
+  - finerenone       # non-steroidal MRA; kidney/heart protection rather than glucose lowering
+
+action_types: [start, add, switch, continue, reduce_dose, stop, avoid]
+
+# preferred = "preferred", "first choice", "first-line"; recommended = "recommend", "should";
+# consider = "may", "consider", "can", "suggest"
+strengths: [preferred, recommended, consider]
+
+# stated = IF and THEN are written in the quote; inferred = something was mapped or added
+labels: [stated, inferred]
+
+# Why a recommendation was not turned into a row
+skip_categories: [not_a_drug_recommendation, other_topic, cannot_express]
+
+# Inputs that name the table's own population (every patient here has type 2
+# diabetes). Dropped from a row's IF: they do not narrow who the rule applies to.
+population_inputs: [t2d, type_2_diabetes, t2dm, diabetes, type_2_diabetes_mellitus]

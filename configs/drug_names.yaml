@@ -1,0 +1,42 @@
+# Drug names per drug class, used to tell drug-level rules ("avoid glyburide")
+# from class-level rules ("avoid sulfonylureas"). See docs/decisions.md D14.
+#
+# STATUS: DRAFT - written by the engineering side from standard generic names.
+# A pharmacist or doctor should confirm it and add brands / Indian generics.
+#
+# names: generic names (matched as whole words, case-insensitive)
+# class_words: regular expressions that mean the guideline is speaking about the class
+classes:
+  metformin:
+    names: []
+    class_words: ['metformin', 'biguanide']
+  sulfonylurea:
+    names: [glyburide, glibenclamide, glipizide, gliclazide, glimepiride, tolbutamide, chlorpropamide]
+    class_words: ['sulfonylurea', 'sulphonylurea', '\bsus?\b', "\bsu[’']s\b"]
+  DPP4i:
+    names: [sitagliptin, saxagliptin, linagliptin, alogliptin, vildagliptin, teneligliptin, evogliptin]
+    class_words: ['dpp-?4', 'dpp-?iv', 'dipeptidyl']
+  SGLT2i:
+    names: [empagliflozin, dapagliflozin, canagliflozin, ertugliflozin, remogliflozin, sotagliflozin]
+    class_words: ['sglt-?2', 'sglt1/2', 'sodium.glucose']
+  GLP1_RA:
+    names: [liraglutide, semaglutide, dulaglutide, exenatide, lixisenatide, albiglutide, efpeglenatide]
+    class_words: ['glp-?1', 'glucagon.like']
+  GIP_GLP1_RA:
+    names: [tirzepatide]
+    class_words: ['\bgip\b', 'dual agonist']
+  TZD:
+    names: [pioglitazone, rosiglitazone, lobeglitazone]
+    class_words: ['\btzds?\b', 'thiazolidinedione']
+  AGI:
+    names: [acarbose, miglitol, voglibose]
+    class_words: ['\bagis?\b', 'alpha.glucosidase']
+  glinide:
+    names: [repaglinide, nateglinide]
+    class_words: ['\bglinides\b', 'meglitinide']
+  insulin:
+    names: []
+    class_words: ['insulin']
+  finerenone:
+    names: [finerenone]
+    class_words: ['\bns-?mras?\b', 'mineralocorticoid']

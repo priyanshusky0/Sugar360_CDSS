@@ -95,14 +95,22 @@ def _normalise(text: str) -> str:
     return " ".join(text.lower().split())
 
 
+def quote_score(quote: str, page_text: str) -> float:
+    """How well `quote` matches the best stretch of `page_text`, 0-100 (100 = word for word).
+
+    The whole quote is matched as one passage: a quote stitched from several
+    places scores low here, and is also flagged by checks.quote_rule_problems.
+    """
+    q = _normalise(quote)
+    return fuzz.partial_ratio(q, _normalise(page_text)) if q else 0.0
+
+
 def quote_found(quote: str, page_text: str, threshold: float = 90.0) -> bool:
     """True if `quote` appears in `page_text`, allowing small extraction differences.
 
-    partial_ratio finds the best-matching stretch of the page (0-100). A
-    threshold below 100 tolerates hyphenation and spacing noise from PDF text.
+    A threshold below 100 tolerates hyphenation and spacing noise from PDF text.
     """
-    q = _normalise(quote)
-    return bool(q) and fuzz.partial_ratio(q, _normalise(page_text)) >= threshold
+    return quote_score(quote, page_text) >= threshold
 
 
 def citation_validity(
@@ -153,19 +161,23 @@ class CallStats:
 
 def cost(
     calls: Iterable[CallStats],
-    usd_per_million_input: float,
-    usd_per_million_output: float,
-) -> dict[str, float]:
-    """Totals for one table. Prices come from configs, from the provider's price page."""
+    usd_per_million_input: float | None,
+    usd_per_million_output: float | None,
+) -> dict[str, float | None]:
+    """Totals for one table. Prices come from configs, from the provider's price page.
+
+    If a price is missing, `usd` is None rather than a guess.
+    """
     calls = list(calls)
     inp = sum(c.input_tokens for c in calls)
     out = sum(c.output_tokens for c in calls)
+    priced = usd_per_million_input is not None and usd_per_million_output is not None
     return {
         "calls": len(calls),
         "input_tokens": inp,
         "output_tokens": out,
         "seconds": sum(c.seconds for c in calls),
-        "usd": inp / 1e6 * usd_per_million_input + out / 1e6 * usd_per_million_output,
+        "usd": inp / 1e6 * usd_per_million_input + out / 1e6 * usd_per_million_output if priced else None,
     }
 
 

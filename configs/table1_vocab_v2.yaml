@@ -1,0 +1,45 @@
+# Test Table 1 - drug choice for type 2 diabetes. Vocabulary v2.
+#
+# STATUS: DRAFT - written by the engineering side. A doctor must review and
+# approve it before evaluation results are trusted.
+#
+# Changes from v1: numeric inputs with units (so thresholds such as eGFR >=30
+# are kept exactly), more patient inputs, more drug classes, an action type
+# (start / add / stop ...) and a recommendation strength.
+#
+# Numeric inputs are written ">=30", ">7", "<45" or "30-45" in the given unit.
+# Category values are quoted on purpose: unquoted yes/no become True/False in YAML.
+
+inputs:
+  on_metformin:              {type: category, values: ["yes", "no"], label: "On metformin"}
+  hba1c_above_target:        {type: category, values: ["yes", "no"], label: "HbA1c above target"}
+  hba1c:                     {type: number, unit: "%", label: "HbA1c"}
+  ascvd:                     {type: category, values: ["yes", "no"], label: "Established ASCVD"}
+  high_cv_risk:              {type: category, values: ["yes", "no"], label: "High CV risk / multiple ASCVD risk factors"}
+  heart_failure:             {type: category, values: ["yes", "no"], label: "Heart failure"}
+  ckd:                       {type: category, values: ["yes", "no"], label: "CKD"}
+  egfr:                      {type: number, unit: "mL/min/1.73 m²", label: "eGFR"}
+  uacr:                      {type: number, unit: "mg/g", label: "UACR"}
+  bmi:                       {type: number, unit: "kg/m²", label: "BMI"}
+  age:                       {type: number, unit: "years", label: "Age"}
+  hypoglycemia_risk:         {type: category, values: ["yes", "no"], label: "High hypoglycemia risk"}
+  symptomatic_hyperglycemia: {type: category, values: ["yes", "no"], label: "Symptomatic / severe hyperglycemia"}
+  cost_constraint:           {type: category, values: ["yes", "no"], label: "Cost / resource constraint"}
+
+actions:
+  - metformin
+  - SGLT2i
+  - GLP1_RA
+  - GIP_GLP1_RA      # dual agonist, e.g. tirzepatide
+  - DPP4i
+  - sulfonylurea
+  - TZD
+  - AGI              # alpha-glucosidase inhibitor
+  - glinide
+  - insulin
+  - finerenone       # non-steroidal MRA; kidney/heart protection rather than glucose lowering
+
+action_types: [start, add, switch, continue, reduce_dose, stop, avoid]
+
+# recommended = "recommend", "should", "preferred"; consider = "may", "consider", "can", "suggest"
+strengths: [recommended, consider]

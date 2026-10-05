@@ -1,0 +1,75 @@
+# Test Table 1 - drug choice for type 2 diabetes. Used by both approaches.
+# Every guideline is drafted separately (one guideline per model call, or per
+# batch of calls). Approach A sends the BM25-selected pages of each guideline;
+# Approach B sends the whole guideline. See docs/decisions.md D11.
+
+table_id: table1_drug_choice
+
+question: >
+  For a given adult patient with type 2 diabetes, which glucose-lowering
+  medicine should be started, added, switched, continued, reduced or stopped?
+  Example: IF on metformin AND HbA1c above target THEN add a second drug, where
+  the choice depends on heart disease, heart failure, kidney function, cost, etc.
+
+vocabulary: configs/table1_vocab_v3.yaml
+
+# The five guidelines. Documents are paths under data/raw/documents/.
+guidelines:
+  - id: ICMR_STW_2022
+    name: ICMR Standard Treatment Workflow - Type 2 Diabetes (2022)
+    documents: [icmr/ICMR_STW_T2DM.pdf]
+  - id: ICMR_2018
+    name: ICMR Guidelines for Management of Type 2 Diabetes (2018)
+    documents: [icmr/ICMR_T2D_Guidelines_2018.pdf]
+  - id: RSSDI_2022
+    name: RSSDI Clinical Practice Recommendations for Type 2 Diabetes (2022)
+    documents: [rssdi/RSSDI_CPR_T2DM_2022.pdf]
+  - id: ADA_2026
+    name: ADA Standards of Care in Diabetes 2026 (sections 6, 9, 10, 11)
+    documents: [ada/dc26s006.pdf, ada/dc26s009.pdf, ada/dc26s010.pdf, ada/dc26s011.pdf]
+  - id: KDIGO_2022
+    name: KDIGO Clinical Practice Guideline for Diabetes Management in CKD (2022)
+    documents: [kdigo/KDIGO_2022_Diabetes_in_CKD.pdf]
+
+# Population of a whole document, added to the IF of every row it sources
+# (docs/decisions.md D14). KDIGO 2022 is about diabetes + CKD; ADA section 11 is CKD.
+document_scope:
+  kdigo/KDIGO_2022_Diabetes_in_CKD.pdf: {ckd: "yes"}
+  ada/dc26s011.pdf: {ckd: "yes"}
+
+# Drug names per class: tells drug-level rules from class-level rules (D14).
+drug_names: configs/drug_names.yaml
+
+# Approach A: BM25 per guideline. Word rarity is learned from all five
+# guidelines together; ranking is done within each guideline.
+retrieval:
+  pages_per_query: 8
+  max_pages_per_guideline: 30
+  queries:
+    - metformin first-line initial pharmacologic therapy type 2 diabetes
+    - add second agent combination therapy HbA1c above target despite metformin intensification
+    - established atherosclerotic cardiovascular disease GLP-1 receptor agonist SGLT2 inhibitor cardiovascular benefit
+    - heart failure SGLT2 inhibitor hospitalization diabetes
+    - chronic kidney disease eGFR albuminuria SGLT2 inhibitor metformin dose kidney
+    - cost affordability sulfonylurea pioglitazone DPP-4 inhibitor low resource
+    - insulin initiation basal insulin very high HbA1c symptomatic hyperglycemia
+
+# Maximum characters of page text per model call. If a guideline's pages are
+# longer, they are split into several calls ("batches") in page order.
+# B's limit fits every whole guideline in one call (largest: RSSDI, ~318k tokens).
+max_chars_per_call:
+  A: 120000
+  B: 1500000
+
+drafting:
+  prompt: prompts/draft_table_v3.md
+  model: gemini-2.5-flash    # D12: 3.5-flash overloaded (503) on 2026-10-05
+  temperature: 0
+
+# USD per million tokens, from Google's pricing page. Empty = report tokens only.
+pricing_usd_per_million:
+  input: null
+  output: null
+
+# Row explained on the "How to read" sheet (D16).
+example_row_id: A-ICMR_STW_2022-3

@@ -1,0 +1,19 @@
+# Extraction settings. Changing this file means the extraction must be redone
+# (python -m sugar360_cds.extraction --force) and the change logged in docs/decisions.md.
+
+# Documents (glob patterns under data/raw/documents/) where pdfplumber table
+# detection is skipped. These are one-page flowcharts: pdfplumber mistakes the
+# box borders for table grid lines and produces garbled cells. PyMuPDF text is
+# still extracted. See docs/decisions.md D7.
+skip_tables_for:
+  - "icmr/ICMR_STW_*.pdf"
+
+# Characters drawn in these symbol fonts are stored under the wrong code
+# (font name without the "ABCDEF+" subset prefix). Translated during
+# extraction; other fonts are untouched (ADA uses real "$" prices).
+# Meanings confirmed from context, e.g. "urine ACR $30 mg/g" and
+# "ejection fraction #40%". See docs/decisions.md D10.
+symbol_font_fixes:
+  AdvOT8817665d:      # KDIGO 2022 and 2024
+    "$": "≥"
+    "#": "≤"
